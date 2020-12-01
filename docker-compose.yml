@@ -1,0 +1,25 @@
+version: "3.7"
+services:
+    bookshop-db:
+        image: postgres:13.0
+        container_name: bookshop-db
+        environment:
+            - POSTGRES_USER=test
+            - POSTGRES_PASSWORD=test
+            - POSTGRES_DB=bookshop
+        ports:
+            - 54320:5432
+        volumes:
+            - ./local/bookshop-data:/var/lib/postgresql/data
+    bookshop-service:
+        build:
+            context: ./
+            dockerfile: BionicHillbilly.BookShopService.Api/Dockerfile
+        container_name: bookshop-service
+        environment:
+            - Database__ConnectionString=Host=host.docker.internal;Port=54320;Database=bookshop;Username=test;Password=test
+        restart: on-failure
+        depends_on:
+            - bookshop-db
+        ports:
+            - 5000:80
